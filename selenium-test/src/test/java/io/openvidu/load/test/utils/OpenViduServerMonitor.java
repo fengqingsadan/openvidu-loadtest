@@ -72,7 +72,7 @@ public class OpenViduServerMonitor {
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
 			this.session = jsch.getSession(username, hostname, 22);
-			session.setPassword("123456");
+			session.setPassword(OpenViduLoadTest.SERVER_SSH_USER_PWD);
 			session.setConfig(config);
 			session.connect();
 		} catch (JSchException e) {

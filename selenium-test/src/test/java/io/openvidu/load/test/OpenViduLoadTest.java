@@ -109,18 +109,18 @@ public class OpenViduLoadTest {
 	static OpenViduServerManager openViduServerManager;
 	public static LogHelper logHelper;
 
-	//openvidu-server密码
+	//openvidu-server密码(必需)
 	public static String OPENVIDU_SECRET = "youdu";
-	//openvidu-server地址
+	//openvidu-server地址(必需)
 	public static String OPENVIDU_URL = "https://mv143.club/";
-	//loadtest webapp地址
+	//loadtest webapp地址(必需)
 	public static String APP_URL = "https://mv143.club/openvidu/loadtest/";
-
-	//服务器地址
+	//服务器地址, 默认从OPENVIDU_URL解析得到
 	public static String SERVER_SSH_HOSTNAME;
-	//服务器登录用户名
+
+	//服务器登录用户名(必需)
 	public static String SERVER_SSH_USER = "xinda";
-	//服务器地址
+	//服务器地址(必需)
 	public static String SERVER_SSH_USER_PWD = "123456";
 	//登录服务器需要用到的key，只有在使用key文件登录的服务器才用到
 	public static String PRIVATE_KEY_PATH = "/opt/openvidu/testload/key.pem";
@@ -128,7 +128,7 @@ public class OpenViduLoadTest {
 	//会话数
 	public static int SESSIONS = 1;
 	//每个会话的人数
-	public static int USERS_SESSION = 2;
+	public static int USERS_SESSION = 5;
 	//等待浏览器的响应秒数
 	public static int SECONDS_OF_WAIT = 40;
 
@@ -140,13 +140,13 @@ public class OpenViduLoadTest {
 	public static String RESULTS_PATH = "D:\\test\\openvidu\\loadtest\\result\\";
 
 	//采集多少次数据
-	public static int NUMBER_OF_POLLS = 4;
+	public static int NUMBER_OF_POLLS = 30;
 	//浏览器数据采集间隔
 	static int BROWSER_POLL_INTERVAL = 1000;
 	//服务器数据采集间隔
 	public static int SERVER_POLL_INTERVAL = 5000;
 	//true: 下载openvidu日志; false: 不下载
-	public static boolean DOWNLOAD_OPENVIDU_LOGS = true;
+	public static boolean DOWNLOAD_OPENVIDU_LOGS = false;
 
 	//以下参数暂不知道含义
 	public static int[] RECORD_BROWSERS;
@@ -352,9 +352,9 @@ public class OpenViduLoadTest {
 		}
 
 		// Process test results
-		ResultsParser resultsParser = new ResultsParser(logHelper);
-		resultsParser.processLoadTestStats();
-		resultsParser.processTcpdumps();
+//		ResultsParser resultsParser = new ResultsParser(logHelper);
+//		resultsParser.processLoadTestStats();
+//		resultsParser.processTcpdumps();
 
 		// Download remote result files from OpenVidu Server instance if configured
 		if (DOWNLOAD_OPENVIDU_LOGS) {

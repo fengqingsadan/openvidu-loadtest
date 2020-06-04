@@ -58,9 +58,8 @@ public class BrowserSshManager {
 		this.jsch = new JSch();
 		Properties config = new Properties();
 		config.put("StrictHostKeyChecking", "no");
-		config.put("PreferredAuthentications", "publickey");
-		jsch.addIdentity(OpenViduLoadTest.PRIVATE_KEY_PATH);
 		jschSession = jsch.getSession(OpenViduLoadTest.SERVER_SSH_USER, amazonInstance.getPublicIp(), 22);
+		jschSession.setPassword(OpenViduLoadTest.SERVER_SSH_USER_PWD);
 		jschSession.setConfig(config);
 		jschSession.connect(10000);
 	}
