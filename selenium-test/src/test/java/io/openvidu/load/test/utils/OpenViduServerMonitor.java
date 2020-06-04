@@ -71,16 +71,32 @@ public class OpenViduServerMonitor {
 			this.jsch = new JSch();
 			Properties config = new Properties();
 			config.put("StrictHostKeyChecking", "no");
-			config.put("PreferredAuthentications", "publickey");
-			jsch.addIdentity(OpenViduLoadTest.PRIVATE_KEY_PATH);
-
 			this.session = jsch.getSession(username, hostname, 22);
+			session.setPassword("123456");
 			session.setConfig(config);
 			session.connect();
 		} catch (JSchException e) {
 			log.error("Error connecting ssh session to OpenVidu Server for monitoring purposes: {}", e.getMessage());
 		}
 	}
+
+//	public OpenViduServerMonitor(String username, String hostname) {
+////		this.username = username;
+////		this.hostname = hostname;
+////		try {
+////			this.jsch = new JSch();
+////			Properties config = new Properties();
+////			config.put("StrictHostKeyChecking", "no");
+////			config.put("PreferredAuthentications", "publickey");
+////			jsch.addIdentity(OpenViduLoadTest.PRIVATE_KEY_PATH);
+////
+////			this.session = jsch.getSession(username, hostname, 22);
+////			session.setConfig(config);
+////			session.connect();
+////		} catch (JSchException e) {
+////			log.error("Error connecting ssh session to OpenVidu Server for monitoring purposes: {}", e.getMessage());
+////		}
+////	}
 
 	public MonitoringStats getMonitoringStats() {
 		String result = sendCommand(FULL_COMMAND);
@@ -91,10 +107,9 @@ public class OpenViduServerMonitor {
 			double[] memUsage = parseMemUsage(rawStats[2].trim());
 			long timestamp = Long.parseLong(rawStats[3].trim());
 			return new MonitoringStats(netInfo, cpuUsage, memUsage, timestamp);
-		} else {
-			log.error("Monitoring stats couldn't be retrieved");
-			return null;
 		}
+		log.error("Monitoring stats couldn't be retrieved");
+		return null;
 	}
 
 	public boolean deleteAllTurnLogs() {
@@ -103,9 +118,8 @@ public class OpenViduServerMonitor {
 		if (result != null && result.isEmpty()) {
 			log.info("COTURN logs cleaned up in OpenVidu Server");
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private String sendCommand(String command) {

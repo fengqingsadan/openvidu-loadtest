@@ -109,22 +109,46 @@ public class OpenViduLoadTest {
 	static OpenViduServerManager openViduServerManager;
 	public static LogHelper logHelper;
 
-	public static String OPENVIDU_SECRET = "MY_SECRET";
-	public static String OPENVIDU_URL = "https://localhost:4443/";
-	public static String APP_URL = "http://localhost:8080/";
-	public static int SESSIONS = 10;
-	public static int USERS_SESSION = 7;
-	public static int SECONDS_OF_WAIT = 40;
-	public static int NUMBER_OF_POLLS = 8;
-	static int BROWSER_POLL_INTERVAL = 1000;
-	public static int SERVER_POLL_INTERVAL = 5000;
-	public static String SERVER_SSH_USER = "ubuntu";
+	//openvidu-server密码
+	public static String OPENVIDU_SECRET = "youdu";
+	//openvidu-server地址
+	public static String OPENVIDU_URL = "https://mv143.club/";
+	//loadtest webapp地址
+	public static String APP_URL = "https://mv143.club/openvidu/loadtest/";
+
+	//服务器地址
 	public static String SERVER_SSH_HOSTNAME;
+	//服务器登录用户名
+	public static String SERVER_SSH_USER = "xinda";
+	//服务器地址
+	public static String SERVER_SSH_USER_PWD = "123456";
+	//登录服务器需要用到的key，只有在使用key文件登录的服务器才用到
 	public static String PRIVATE_KEY_PATH = "/opt/openvidu/testload/key.pem";
+
+	//会话数
+	public static int SESSIONS = 1;
+	//每个会话的人数
+	public static int USERS_SESSION = 2;
+	//等待浏览器的响应秒数
+	public static int SECONDS_OF_WAIT = 40;
+
+	//启用远程浏览器
 	public static boolean REMOTE = false;
+	//true: 打开浏览器就立马开始会话; false: 等待所有浏览器都创建完成后才开始会话
 	public static boolean BROWSER_INIT_AT_ONCE = false;
-	public static String RESULTS_PATH = "/opt/openvidu/testload";
+	//结果保存到的目录
+	public static String RESULTS_PATH = "D:\\test\\openvidu\\loadtest\\result\\";
+
+	//采集多少次数据
+	public static int NUMBER_OF_POLLS = 4;
+	//浏览器数据采集间隔
+	static int BROWSER_POLL_INTERVAL = 1000;
+	//服务器数据采集间隔
+	public static int SERVER_POLL_INTERVAL = 5000;
+	//true: 下载openvidu日志; false: 不下载
 	public static boolean DOWNLOAD_OPENVIDU_LOGS = true;
+
+	//以下参数暂不知道含义
 	public static int[] RECORD_BROWSERS;
 	public static JsonObject[] NETWORK_RESTRICTIONS_BROWSERS;
 	public static boolean TCPDUMP_CAPTURE_BEFORE_CONNECT;
@@ -216,12 +240,11 @@ public class OpenViduLoadTest {
 		if (tcpdumpCaptureTime != null) {
 			TCPDUMP_CAPTURE_TIME = Integer.parseInt(tcpdumpCaptureTime);
 		}
+		SERVER_SSH_HOSTNAME = OpenViduLoadTest.OPENVIDU_URL.replace("https://", "").replaceAll(":[0-9]+/$", "")
+				.replaceAll("/$", "");
 
 		initializeRecordBrowsersProperty(recordBrowsers);
 		initializeNetworkRestrictionsBrowsersProperty(networkRestrictionsBrowsers);
-
-		SERVER_SSH_HOSTNAME = OpenViduLoadTest.OPENVIDU_URL.replace("https://", "").replaceAll(":[0-9]+/$", "")
-				.replaceAll("/$", "");
 
 		browserProvider = REMOTE ? new RemoteBrowserProvider() : new LocalBrowserProvider();
 		startNewSession[0] = new CustomLatch(USERS_SESSION * NUMBER_OF_POLLS);
@@ -290,7 +313,6 @@ public class OpenViduLoadTest {
 
 	@AfterAll
 	static void bringDown() {
-
 		// Log test finished event
 		JsonObject testFinishedEvent = new JsonObject();
 		testFinishedEvent.addProperty("name", "testFinished");
@@ -313,7 +335,9 @@ public class OpenViduLoadTest {
 		log.info("All browsers are now closed");
 
 		// Stop OpenVidu Server monitoring thread
-		openViduServerManager.stopMonitoringPolling();
+		if(null != openViduServerManager){
+			openViduServerManager.stopMonitoringPolling();
+		}
 
 		log.info("Load test finished");
 
@@ -336,8 +360,10 @@ public class OpenViduLoadTest {
 		if (DOWNLOAD_OPENVIDU_LOGS) {
 			log.info("Test configured to download remote result files");
 			try {
-				openViduServerManager = new OpenViduServerManager();
-				openViduServerManager.downloadOpenViduKmsLogFiles();
+				if(null != openViduServerManager){
+					openViduServerManager = new OpenViduServerManager();
+					openViduServerManager.downloadOpenViduKmsLogFiles();
+				}
 			} catch (InterruptedException e) {
 				log.error("Some log download thread couldn't finish in 5 minutes: {}", e.getMessage());
 			}
@@ -376,12 +402,12 @@ public class OpenViduLoadTest {
 		log.info("Starting load test");
 		timeTestStarted = System.currentTimeMillis();
 
-		// Log test started event
-		JsonObject testStartedEvent = new JsonObject();
-		testStartedEvent.addProperty("name", "testStarted");
 		JsonObject jsonProperties = new JsonObject();
 		jsonProperties.addProperty("sessions", SESSIONS);
 		jsonProperties.addProperty("usersSession", USERS_SESSION);
+
+		JsonObject testStartedEvent = new JsonObject();
+		testStartedEvent.addProperty("name", "testStarted");
 		testStartedEvent.add("properties", jsonProperties);
 		logHelper.logTestEvent(testStartedEvent);
 
@@ -391,8 +417,10 @@ public class OpenViduLoadTest {
 		openViduServerManager.startMonitoringPolling();
 
 		if (BROWSER_INIT_AT_ONCE) {
+			//打开浏览器就立马开始会话
 			this.startSessionAllBrowsersAtOnce(1);
 		} else {
+			//在所有浏览器都准备好后开始会话
 			this.startSessionBrowserAfterBrowser(1);
 		}
 	}
@@ -402,6 +430,7 @@ public class OpenViduLoadTest {
 	 * initialization thread is in charge of running the test)
 	 **/
 
+	//在所有浏览器都准备好后执行
 	private void startSessionBrowserAfterBrowser(int sessionIndex) {
 		String sessionId = "session-" + sessionIndex;
 		lastSession = sessionId;
@@ -487,8 +516,9 @@ public class OpenViduLoadTest {
 				.networkRestriction(getNetworkRestriction(sessionIndex, userIndex)).build();
 
 		Browser browser = browserProvider.getBrowser(properties);
-		browser.getDriver().get(APP_URL + "?publicurl=" + OPENVIDU_URL + "&secret=" + OPENVIDU_SECRET + "&sessionId="
-				+ sessionId + "&userId=" + userId);
+		String url = APP_URL + "?publicurl=" + OPENVIDU_URL + "&secret=" + OPENVIDU_SECRET + "&sessionId="
+				+ sessionId + "&userId=" + userId;
+		browser.getDriver().get(url);
 		browser.getManager().startEventPolling(userId, sessionId);
 
 		Collection<Browser> browsers = sessionIdsBrowsers.putIfAbsent(sessionId, new ArrayList<>());
@@ -719,8 +749,7 @@ public class OpenViduLoadTest {
 
 		browser.getManager().stopEventPolling();
 
-		log.info(
-				"User {} is now seeing a stable session ({}). OpenVidu events polling thread interrupted and starting stats gathering",
+		log.info("User {} is now seeing a stable session ({}). OpenVidu events polling thread interrupted and starting stats gathering",
 				browser.getUserId(), browser.getSessionId());
 
 		startStatsGathering(browser);

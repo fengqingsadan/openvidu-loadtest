@@ -52,8 +52,7 @@ public class OpenViduServerManager {
 	private OpenViduServerMonitor monitor;
 
 	public OpenViduServerManager() {
-		this.monitor = new OpenViduServerMonitor(OpenViduLoadTest.SERVER_SSH_USER,
-				OpenViduLoadTest.SERVER_SSH_HOSTNAME);
+		this.monitor = new OpenViduServerMonitor(OpenViduLoadTest.SERVER_SSH_USER, OpenViduLoadTest.SERVER_SSH_HOSTNAME);
 	}
 
 	public void startMonitoringPolling() {

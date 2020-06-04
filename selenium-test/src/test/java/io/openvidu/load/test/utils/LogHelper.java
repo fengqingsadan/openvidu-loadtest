@@ -55,8 +55,7 @@ public class LogHelper {
 
 	public LogHelper() throws IOException {
 		String resultsPath = OpenViduLoadTest.RESULTS_PATH;
-		File testDirectory = new File(resultsPath.replaceAll("/$", "") + "/loadtest_"
-				+ (new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date())));
+		File testDirectory = new File(resultsPath.replaceAll("/$", "") + "/loadtest_"+System.currentTimeMillis());
 		testDirectory.mkdirs();
 
 		testLogWriter = new FileWriter(new File(testDirectory, testLogFilename), true);

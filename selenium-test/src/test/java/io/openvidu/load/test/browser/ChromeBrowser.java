@@ -17,6 +17,7 @@
 
 package io.openvidu.load.test.browser;
 
+import org.junit.platform.commons.util.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -46,9 +47,13 @@ public class ChromeBrowser extends Browser {
 		// This flag allows to load fake media files from host
 		options.addArguments("--allow-file-access-from-files");
 		// This flag sets the video input
-		options.addArguments("--use-file-for-fake-video-capture=" + videoFileLocation);
+		if(!StringUtils.isBlank(videoFileLocation)){
+			options.addArguments("--use-file-for-fake-video-capture=" + videoFileLocation);
+		}
 		// This flag sets the audio input
-		options.addArguments("--use-file-for-fake-audio-capture=" + audioFileLocation);
+		if(!StringUtils.isBlank(audioFileLocation)){
+			options.addArguments("--use-file-for-fake-audio-capture=" + audioFileLocation);
+		}
 		return options;
 	}
 

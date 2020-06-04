@@ -38,6 +38,8 @@ import org.slf4j.Logger;
 public class LocalBrowserProvider implements BrowserProvider {
 
 	final static Logger log = getLogger(lookup().lookupClass());
+	final static String audioPath = "D:\\Youdu\\codes\\openvidu\\openvidu-loadtest\\media-files\\fakeaudio.wav";
+	final static String videoPath = "D:\\Youdu\\codes\\openvidu\\openvidu-loadtest\\media-files\\fakevideo.y4m";
 
 	@Override
 	public Browser getBrowser(BrowserProperties properties) {
@@ -45,8 +47,7 @@ public class LocalBrowserProvider implements BrowserProvider {
 
 		switch (properties.type()) {
 		case "chrome":
-			ChromeOptions options = ChromeBrowser.generateFakeVideoChromeOptions("/opt/openvidu/fakevideo.y4m",
-					"/opt/openvidu/fakeaudio.wav");
+			ChromeOptions options = ChromeBrowser.generateFakeVideoChromeOptions("", audioPath);
 			options.setAcceptInsecureCerts(true);
 			WebDriver driver = new ChromeDriver(options);
 			browser = new ChromeBrowser(properties, driver);
