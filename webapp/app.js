@@ -26,14 +26,17 @@ window.onload = () => {
 	}
 };
 
+//追加新的事件
 function appendEvent(newEvent) {
 	window.openviduLoadTest.events.push(newEvent);
 }
 
+//追加状态
 function appendStats(userId, stat) {
 	window.openviduLoadTest.stats[userId].push(stat);
 }
 
+//加入会话
 function joinSession() {
 	OV = new OpenVidu();
 	session = OV.initSession();
@@ -80,6 +83,7 @@ function joinSession() {
 
 }
 
+//离开会话
 function leaveSession() {
 	session.disconnect();
 }
@@ -88,6 +92,7 @@ window.onbeforeunload = () => {
 	if (session) leaveSession();
 };
 
+//增加一个视频窗口
 function insertPublisherContainer() {
 	var commonTagStyle = "display: inline-block; cursor: pointer; background-color: #daae00; color: white; font-size: 13px; font-weight: bold; padding: 1px 3px; border-radius: 3px; font-family: 'Arial';";
 	var videoContainer = document.createElement('div');
@@ -132,6 +137,7 @@ function insertPublisherContainer() {
 	return videoContainer;
 }
 
+//设置按钮的操作
 function setPublisherButtonsActions(publisher) {
 	document.getElementById('mute').onclick = (e) => {
 		event.target.innerText = event.target.innerText === 'Mute' ? 'Unmute' : 'Mute';
@@ -172,6 +178,7 @@ function setPublisherButtonsActions(publisher) {
 	});
 }
 
+//增加一个订阅者窗口
 function insertSubscriberContainer(event) {
 	var commonTagStyle = "background-color: #0088aa; color: white; font-size: 13px; font-weight: bold; padding: 1px 3px; border-radius: 3px; font-family: 'Arial'";
 	var videoContainer = document.createElement('div');
@@ -215,6 +222,7 @@ function insertSubscriberContainer(event) {
 	return videoContainer;
 }
 
+//初始化页面
 function initFormValues() {
 	document.getElementById("form-publicurl").value = OPENVIDU_SERVER_URL;
 	document.getElementById("form-secret").value = OPENVIDU_SERVER_SECRET;
@@ -222,6 +230,7 @@ function initFormValues() {
 	document.getElementById("form-userId").value = USER_ID;
 }
 
+//使用页面表单的数据加入会话
 function joinWithForm() {
 	OPENVIDU_SERVER_URL = document.getElementById("form-publicurl").value;
 	OPENVIDU_SERVER_SECRET = document.getElementById("form-secret").value;
@@ -232,10 +241,12 @@ function joinWithForm() {
 	return false;
 }
 
+//获取加入会话的token
 function getToken() {
 	return createSession().then(sessionId => createToken(sessionId));
 }
 
+//创建会话
 function createSession() { // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-apisessions
 	return new Promise((resolve, reject) => {
 		var request = new XMLHttpRequest();
@@ -259,6 +270,7 @@ function createSession() { // See https://docs.openvidu.io/en/stable/reference-d
 	});
 }
 
+//创建token
 function createToken() { // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-apitokens
 	return new Promise((resolve, reject) => {
 		var request = new XMLHttpRequest();
@@ -278,12 +290,14 @@ function createToken() { // See https://docs.openvidu.io/en/stable/reference-doc
 	});
 }
 
+//接收事件和状态
 function collectEventsAndStats() {
 	this.session.streamManagers.forEach(streamManager => {
 		this.gatherStatsForPeer(streamManager.stream.getRTCPeerConnection(), streamManager.stream.connection.data, streamManager.remote);
 	});
 }
 
+//重置时间和状态
 function resetEventsAndStats() {
 	window.openviduLoadTest.events = [];
 	Object.keys(window.openviduLoadTest.stats).forEach(userId => {
@@ -291,6 +305,7 @@ function resetEventsAndStats() {
 	});
 }
 
+//收集帧的状态
 function gatherStatsForPeer(rtcPeerConnection, userId, isSubscriber, errorCallback) {
 	return rtcPeerConnection.getStats(response => {
 		const fullReport = [];
